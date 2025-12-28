@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UserRequestDto, UserResponseDto } from '../types/User';
+import { type UserRequestDto, type UserResponseDto } from '../types/User';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

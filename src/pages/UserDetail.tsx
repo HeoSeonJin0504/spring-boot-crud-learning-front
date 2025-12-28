@@ -4,15 +4,26 @@ import {
   Alert,
   Box,
   Button,
+  Card,
+  CardContent,
   CircularProgress,
   Container,
   Divider,
+  Grid,
   Paper,
   Typography,
 } from '@mui/material';
-import { Edit, Delete, ArrowBack } from '@mui/icons-material';
+import {
+  Edit,
+  Delete,
+  ArrowBack,
+  EmailOutlined,
+  PersonOutline,
+  CalendarTodayOutlined,
+  UpdateOutlined,
+} from '@mui/icons-material';
 import { userService } from '../services/api';
-import { UserResponseDto } from '../types/User';
+import { type UserResponseDto } from '../types/User';
 
 function UserDetail() {
   const { id } = useParams();
@@ -34,7 +45,10 @@ function UserDetail() {
       const response = await userService.getUserById(userId);
       setUser(response.data);
     } catch (error: any) {
-      setError(error.response?.data?.message || '사용자 정보를 불러오는데 실패했습니다.');
+      setError(
+        error.response?.data?.message ||
+          '사용자 정보를 불러오는데 실패했습니다.'
+      );
       console.error('Failed to load user:', error);
     } finally {
       setLoading(false);
@@ -42,7 +56,7 @@ function UserDetail() {
   };
 
   const handleDelete = async () => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
+    if (window.confirm(`"${user?.name}" 사용자를 정말 삭제하시겠습니까?`)) {
       try {
         await userService.deleteUser(Number(id));
         navigate('/users');
@@ -55,86 +69,134 @@ function UserDetail() {
 
   if (loading) {
     return (
-      <Container maxWidth="sm" sx={{ py: 4, textAlign: 'center' }}>
-        <CircularProgress />
+      <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
+        <CircularProgress size={60} />
+        <Typography sx={{ mt: 2 }} color="text.secondary">
+          데이터를 불러오는 중...
+        </Typography>
       </Container>
     );
   }
 
   if (error || !user) {
     return (
-      <Container maxWidth="sm" sx={{ py: 4 }}>
-        <Alert severity="error">{error || '사용자를 찾을 수 없습니다.'}</Alert>
-        <Button
-          variant="outlined"
-          onClick={() => navigate('/users')}
-          sx={{ mt: 2 }}
-        >
-          목록으로
-        </Button>
-      </Container>
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', py: 4 }}>
+        <Container maxWidth="sm">
+          <Alert severity="error">
+            {error || '사용자를 찾을 수 없습니다.'}
+          </Alert>
+          <Button
+            variant="outlined"
+            onClick={() => navigate('/users')}
+            sx={{ mt: 2 }}
+            startIcon={<ArrowBack />}
+          >
+            목록으로
+          </Button>
+        </Container>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4 }}>
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          사용자 상세 정보
-        </Typography>
-
-        <Divider sx={{ my: 3 }} />
-
-        <Box sx={{ mt: 3 }}>
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="caption" color="text.secondary">
-              ID
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', py: 4 }}>
+      <Container maxWidth="md">
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+            <Typography variant="h4" component="h1" fontWeight="bold">
+              사용자 상세 정보
             </Typography>
-            <Typography variant="h6">{user.id}</Typography>
-          </Box>
-
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="caption" color="text.secondary">
-              이메일
-            </Typography>
-            <Typography variant="h6">{user.email}</Typography>
-          </Box>
-
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="caption" color="text.secondary">
-              이름
-            </Typography>
-            <Typography variant="h6">{user.name}</Typography>
-          </Box>
-
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="caption" color="text.secondary">
-              생성일
-            </Typography>
-            <Typography variant="body1">
-              {user.createdAt ? new Date(user.createdAt).toLocaleString('ko-KR') : '-'}
+            <Typography
+              variant="h6"
+              sx={{
+                bgcolor: 'primary.main',
+                color: 'white',
+                px: 2,
+                py: 0.5,
+                borderRadius: 1,
+              }}
+            >
+              ID: {user.id}
             </Typography>
           </Box>
 
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="caption" color="text.secondary">
-              수정일
-            </Typography>
-            <Typography variant="body1">
-              {user.updatedAt ? new Date(user.updatedAt).toLocaleString('ko-KR') : '-'}
-            </Typography>
-          </Box>
-        </Box>
+          <Divider sx={{ my: 3 }} />
 
-        <Divider sx={{ my: 3 }} />
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <EmailOutlined sx={{ mr: 1, color: 'primary.main' }} />
+                    <Typography variant="caption" color="text.secondary">
+                      이메일
+                    </Typography>
+                  </Box>
+                  <Typography variant="h6">{user.email}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
 
-        <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
-          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <PersonOutline sx={{ mr: 1, color: 'success.main' }} />
+                    <Typography variant="caption" color="text.secondary">
+                      이름
+                    </Typography>
+                  </Box>
+                  <Typography variant="h6">{user.name}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <CalendarTodayOutlined sx={{ mr: 1, color: 'info.main' }} />
+                    <Typography variant="caption" color="text.secondary">
+                      생성일
+                    </Typography>
+                  </Box>
+                  <Typography variant="body1">
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleString('ko-KR')
+                      : '-'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <UpdateOutlined sx={{ mr: 1, color: 'warning.main' }} />
+                    <Typography variant="caption" color="text.secondary">
+                      수정일
+                    </Typography>
+                  </Box>
+                  <Typography variant="body1">
+                    {user.updatedAt
+                      ? new Date(user.updatedAt).toLocaleString('ko-KR')
+                      : '-'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 4 }} />
+
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <Button
               variant="contained"
               startIcon={<Edit />}
               onClick={() => navigate(`/users/${id}/edit`)}
-              fullWidth
+              size="large"
+              sx={{ flex: 1, minWidth: 150 }}
             >
               수정
             </Button>
@@ -143,21 +205,24 @@ function UserDetail() {
               color="error"
               startIcon={<Delete />}
               onClick={handleDelete}
-              fullWidth
+              size="large"
+              sx={{ flex: 1, minWidth: 150 }}
             >
               삭제
             </Button>
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBack />}
+              onClick={() => navigate('/users')}
+              size="large"
+              fullWidth
+            >
+              목록으로 돌아가기
+            </Button>
           </Box>
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBack />}
-            onClick={() => navigate('/users')}
-          >
-            목록으로
-          </Button>
-        </Box>
-      </Paper>
-    </Container>
+        </Paper>
+      </Container>
+    </Box>
   );
 }
 
