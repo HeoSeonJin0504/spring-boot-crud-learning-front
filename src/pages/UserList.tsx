@@ -93,7 +93,7 @@ function UserList() {
             <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
               사용자 목록
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" component="div">
               총 <Chip label={users.length} size="small" color="primary" />명의
               사용자가 등록되어 있습니다
             </Typography>
