@@ -21,6 +21,8 @@ import {
   PersonOutline,
   CalendarTodayOutlined,
   UpdateOutlined,
+  PhoneOutlined,
+  WcOutlined,
 } from '@mui/icons-material';
 import { userService } from '../services/api';
 import { type UserResponseDto } from '../types/User';
@@ -127,12 +129,12 @@ function UserDetail() {
               <Card variant="outlined">
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <EmailOutlined sx={{ mr: 1, color: 'primary.main' }} />
+                    <PersonOutline sx={{ mr: 1, color: 'success.main' }} />
                     <Typography variant="caption" color="text.secondary">
-                      이메일
+                      이름
                     </Typography>
                   </Box>
-                  <Typography variant="h6">{user.email}</Typography>
+                  <Typography variant="h6">{user.name}</Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -141,12 +143,40 @@ function UserDetail() {
               <Card variant="outlined">
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <PersonOutline sx={{ mr: 1, color: 'success.main' }} />
+                    <WcOutlined sx={{ mr: 1, color: user.gender === '남성' ? 'primary.main' : 'secondary.main' }} />
                     <Typography variant="caption" color="text.secondary">
-                      이름
+                      성별
                     </Typography>
                   </Box>
-                  <Typography variant="h6">{user.name}</Typography>
+                  <Typography variant="h6">{user.gender}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <PhoneOutlined sx={{ mr: 1, color: 'info.main' }} />
+                    <Typography variant="caption" color="text.secondary">
+                      전화번호
+                    </Typography>
+                  </Box>
+                  <Typography variant="h6">{user.phone}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <EmailOutlined sx={{ mr: 1, color: 'warning.main' }} />
+                    <Typography variant="caption" color="text.secondary">
+                      이메일
+                    </Typography>
+                  </Box>
+                  <Typography variant="h6">{user.email}</Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -173,7 +203,7 @@ function UserDetail() {
               <Card variant="outlined">
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <UpdateOutlined sx={{ mr: 1, color: 'warning.main' }} />
+                    <UpdateOutlined sx={{ mr: 1, color: 'success.main' }} />
                     <Typography variant="caption" color="text.secondary">
                       수정일
                     </Typography>

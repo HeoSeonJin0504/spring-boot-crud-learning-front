@@ -137,16 +137,19 @@ function UserList() {
                   ID
                 </TableCell>
                 <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
-                  이메일
-                </TableCell>
-                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
                   이름
                 </TableCell>
                 <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
-                  생성일
+                  성별
                 </TableCell>
                 <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
-                  수정일
+                  전화번호
+                </TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
+                  이메일
+                </TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
+                  생성일
                 </TableCell>
                 <TableCell
                   align="center"
@@ -159,7 +162,7 @@ function UserList() {
             <TableBody>
               {users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
+                  <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
                     <Typography variant="h6" color="text.secondary">
                       등록된 사용자가 없습니다
                     </Typography>
@@ -187,18 +190,21 @@ function UserList() {
                     <TableCell>
                       <Chip label={user.id} size="small" />
                     </TableCell>
-                    <TableCell>{user.email}</TableCell>
                     <TableCell>
                       <Typography fontWeight="500">{user.name}</Typography>
                     </TableCell>
                     <TableCell>
+                      <Chip 
+                        label={user.gender} 
+                        size="small" 
+                        color={user.gender === '남성' ? 'primary' : 'secondary'}
+                      />
+                    </TableCell>
+                    <TableCell>{user.phone}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
                       {user.createdAt
                         ? new Date(user.createdAt).toLocaleString('ko-KR')
-                        : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {user.updatedAt
-                        ? new Date(user.updatedAt).toLocaleString('ko-KR')
                         : '-'}
                     </TableCell>
                     <TableCell align="center" onClick={(e) => e.stopPropagation()}>

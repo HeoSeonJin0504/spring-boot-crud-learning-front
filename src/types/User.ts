@@ -1,13 +1,17 @@
 export interface UserResponseDto {
   id: number;
-  email: string;
   name: string;
+  gender: string;
+  phone: string;
+  email: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface UserRequestDto {
-  email: string;
-  password: string;
   name: string;
+  password: string;
+  gender: string;
+  phone: string;
+  email: string;
 }
