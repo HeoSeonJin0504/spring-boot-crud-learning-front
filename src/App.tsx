@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import UserList from './pages/UserList';
 import UserForm from './pages/UserForm';
 import UserDetail from './pages/UserDetail';
+import Navbar from './components/Navbar';
 import { authService } from './services/authService';
 
 const theme = createTheme({
@@ -49,6 +50,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
+        <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

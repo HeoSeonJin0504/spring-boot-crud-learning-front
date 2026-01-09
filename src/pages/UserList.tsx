@@ -23,7 +23,6 @@ import {
   Delete,
   Edit,
   Visibility,
-  Home as HomeIcon,
   Refresh,
 } from '@mui/icons-material';
 import { userService } from '../services/api';
@@ -99,13 +98,6 @@ function UserList() {
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
-              variant="outlined"
-              startIcon={<HomeIcon />}
-              onClick={() => navigate('/')}
-            >
-              홈
-            </Button>
             <Button
               variant="outlined"
               startIcon={<Refresh />}
