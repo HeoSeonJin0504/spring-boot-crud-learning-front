@@ -93,13 +93,13 @@ function UserForm() {
       errors.phone = '전화번호 형식이 올바르지 않습니다 (예: 010-1234-5678)';
     }
 
-    // 이메일 검증
-    if (!formData.email.trim()) {
-      errors.email = '이메일은 필수입니다';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = '올바른 이메일 형식이 아닙니다';
-    } else if (formData.email.length > 100) {
-      errors.email = '이메일은 100자를 초과할 수 없습니다';
+    // 이메일 검증 (선택사항이지만 입력된 경우 형식 검증)
+    if (formData.email && formData.email.trim()) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        errors.email = '올바른 이메일 형식이 아닙니다';
+      } else if (formData.email.length > 100) {
+        errors.email = '이메일은 100자를 초과할 수 없습니다';
+      }
     }
 
     setValidationErrors(errors);
@@ -208,6 +208,9 @@ function UserForm() {
               SelectProps={{
                 native: true,
               }}
+              InputLabelProps={{
+                shrink: true,
+              }}
             >
               <option value="">선택하세요</option>
               <option value="남성">남성</option>
@@ -228,7 +231,7 @@ function UserForm() {
             />
             <TextField
               fullWidth
-              label="이메일 *"
+              label="이메일"
               name="email"
               type="email"
               value={formData.email}
@@ -236,7 +239,7 @@ function UserForm() {
               margin="normal"
               error={Boolean(validationErrors.email)}
               helperText={
-                validationErrors.email || '예: user@example.com (최대 100자)'
+                validationErrors.email || '예: user@example.com (선택사항, 최대 100자)'
               }
             />
 

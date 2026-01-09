@@ -3,7 +3,7 @@ export interface UserResponseDto {
   name: string;
   gender: string;
   phone: string;
-  email: string;
+  email: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -13,5 +13,5 @@ export interface UserRequestDto {
   password: string;
   gender: string;
   phone: string;
-  email: string;
+  email?: string;
 }

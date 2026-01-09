@@ -176,7 +176,7 @@ function UserDetail() {
                       이메일
                     </Typography>
                   </Box>
-                  <Typography variant="h6">{user.email}</Typography>
+                  <Typography variant="h6">{user.email || '미등록'}</Typography>
                 </CardContent>
               </Card>
             </Grid>
