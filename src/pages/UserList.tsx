@@ -134,7 +134,10 @@ function UserList() {
             <TableHead>
               <TableRow sx={{ bgcolor: 'primary.main' }}>
                 <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
-                  ID
+                  번호
+                </TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
+                  아이디
                 </TableCell>
                 <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
                   이름
@@ -162,7 +165,7 @@ function UserList() {
             <TableBody>
               {users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
+                  <TableCell colSpan={8} align="center" sx={{ py: 8 }}>
                     <Typography variant="h6" color="text.secondary">
                       등록된 사용자가 없습니다
                     </Typography>
@@ -179,20 +182,21 @@ function UserList() {
               ) : (
                 users.map((user) => (
                   <TableRow
-                    key={user.id}
+                    key={user.userIndex}
                     hover
                     sx={{
                       '&:hover': { bgcolor: 'action.hover' },
                       cursor: 'pointer',
                     }}
-                    onClick={() => navigate(`/users/${user.id}`)}
+                    onClick={() => navigate(`/users/${user.userIndex}`)}
                   >
                     <TableCell>
-                      <Chip label={user.id} size="small" />
+                      <Chip label={user.userIndex} size="small" />
                     </TableCell>
                     <TableCell>
-                      <Typography fontWeight="500">{user.name}</Typography>
+                      <Typography fontWeight="500">{user.userId}</Typography>
                     </TableCell>
+                    <TableCell>{user.name}</TableCell>
                     <TableCell>
                       <Chip 
                         label={user.gender} 
@@ -201,7 +205,7 @@ function UserList() {
                       />
                     </TableCell>
                     <TableCell>{user.phone}</TableCell>
-                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.email || '-'}</TableCell>
                     <TableCell>
                       {user.createdAt
                         ? new Date(user.createdAt).toLocaleString('ko-KR')
@@ -212,7 +216,7 @@ function UserList() {
                         <IconButton
                           size="small"
                           color="info"
-                          onClick={() => navigate(`/users/${user.id}`)}
+                          onClick={() => navigate(`/users/${user.userIndex}`)}
                         >
                           <Visibility />
                         </IconButton>
@@ -221,7 +225,7 @@ function UserList() {
                         <IconButton
                           size="small"
                           color="primary"
-                          onClick={() => navigate(`/users/${user.id}/edit`)}
+                          onClick={() => navigate(`/users/${user.userIndex}/edit`)}
                         >
                           <Edit />
                         </IconButton>
@@ -230,7 +234,7 @@ function UserList() {
                         <IconButton
                           size="small"
                           color="error"
-                          onClick={() => handleDelete(user.id, user.name)}
+                          onClick={() => handleDelete(user.userIndex, user.name)}
                         >
                           <Delete />
                         </IconButton>

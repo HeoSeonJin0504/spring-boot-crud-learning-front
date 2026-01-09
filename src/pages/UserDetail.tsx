@@ -118,13 +118,27 @@ function UserDetail() {
                 borderRadius: 1,
               }}
             >
-              ID: {user.id}
+              번호: {user.userIndex}
             </Typography>
           </Box>
 
           <Divider sx={{ my: 3 }} />
 
           <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <PersonOutline sx={{ mr: 1, color: 'primary.main' }} />
+                    <Typography variant="caption" color="text.secondary">
+                      아이디
+                    </Typography>
+                  </Box>
+                  <Typography variant="h6">{user.userId}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
             <Grid item xs={12} md={6}>
               <Card variant="outlined">
                 <CardContent>

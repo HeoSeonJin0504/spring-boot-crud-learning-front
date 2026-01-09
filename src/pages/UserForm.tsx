@@ -19,8 +19,9 @@ function UserForm() {
   const isEditMode = Boolean(id);
 
   const [formData, setFormData] = useState<UserRequestDto>({
-    name: '',
+    userId: '',
     password: '',
+    name: '',
     gender: '',
     phone: '',
     email: '',
@@ -28,8 +29,9 @@ function UserForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{
-    name?: string;
+    userId?: string;
     password?: string;
+    name?: string;
     gender?: string;
     phone?: string;
     email?: string;
@@ -45,11 +47,12 @@ function UserForm() {
     try {
       const response = await userService.getUserById(userId);
       setFormData({
-        name: response.data.name,
+        userId: response.data.userId,
         password: '',
+        name: response.data.name,
         gender: response.data.gender,
         phone: response.data.phone,
-        email: response.data.email,
+        email: response.data.email || '',
       });
     } catch (error: any) {
       setError(
@@ -62,6 +65,17 @@ function UserForm() {
 
   const validateForm = (): boolean => {
     const errors: typeof validationErrors = {};
+
+    // 아이디 검증 (생성 시에만)
+    if (!isEditMode) {
+      if (!formData.userId.trim()) {
+        errors.userId = '아이디는 필수입니다';
+      } else if (formData.userId.length < 4 || formData.userId.length > 50) {
+        errors.userId = '아이디는 4자 이상 50자 이하여야 합니다';
+      } else if (!/^[a-zA-Z0-9_]+$/.test(formData.userId)) {
+        errors.userId = '아이디는 영문, 숫자, 언더스코어(_)만 사용 가능합니다';
+      }
+    }
 
     // 이름 검증
     if (!formData.name.trim()) {
@@ -170,6 +184,20 @@ function UserForm() {
           )}
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            {!isEditMode && (
+              <TextField
+                fullWidth
+                label="아이디 *"
+                name="userId"
+                value={formData.userId}
+                onChange={handleChange}
+                margin="normal"
+                error={Boolean(validationErrors.userId)}
+                helperText={
+                  validationErrors.userId || '4-50자, 영문/숫자/언더스코어(_)만 사용'
+                }
+              />
+            )}
             <TextField
               fullWidth
               label="이름 *"

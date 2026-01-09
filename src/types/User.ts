@@ -1,5 +1,6 @@
 export interface UserResponseDto {
-  id: number;
+  userIndex: number;
+  userId: string;
   name: string;
   gender: string;
   phone: string;
@@ -9,8 +10,9 @@ export interface UserResponseDto {
 }
 
 export interface UserRequestDto {
-  name: string;
+  userId: string;
   password: string;
+  name: string;
   gender: string;
   phone: string;
   email?: string;

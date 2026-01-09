@@ -1,9 +1,12 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import UserList from './pages/UserList';
 import UserForm from './pages/UserForm';
 import UserDetail from './pages/UserDetail';
+import { authService } from './services/authService';
 
 const theme = createTheme({
   palette: {
@@ -36,6 +39,11 @@ const theme = createTheme({
   },
 });
 
+// 인증이 필요한 라우트 보호
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  return authService.isAuthenticated() ? <>{children}</> : <Navigate to="/login" />;
+}
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -43,10 +51,40 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/users" element={<UserList />} />
-          <Route path="/users/new" element={<UserForm />} />
-          <Route path="/users/:id" element={<UserDetail />} />
-          <Route path="/users/:id/edit" element={<UserForm />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/users"
+            element={
+              <PrivateRoute>
+                <UserList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/users/new"
+            element={
+              <PrivateRoute>
+                <UserForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/users/:id"
+            element={
+              <PrivateRoute>
+                <UserDetail />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/users/:id/edit"
+            element={
+              <PrivateRoute>
+                <UserForm />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </Router>
     </ThemeProvider>
