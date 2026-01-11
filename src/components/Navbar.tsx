@@ -1,12 +1,43 @@
-import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { AppBar, Box, Button, Container, Toolbar, Typography, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { Home, Logout, People } from '@mui/icons-material';
+import { Home, Logout, People, Person } from '@mui/icons-material';
 import { authService } from '../services/authService';
+import { userService } from '../services/api';
 
 function Navbar() {
   const navigate = useNavigate();
   const isAuthenticated = authService.isAuthenticated();
-  const currentUser = authService.getCurrentUser();
+  const [userName, setUserName] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadUserInfo();
+    } else {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  const loadUserInfo = async () => {
+    try {
+      // 먼저 localStorage에서 확인
+      const storedUser = authService.getStoredUser();
+      if (storedUser?.name) {
+        setUserName(storedUser.name);
+      }
+      
+      // 서버에서 최신 정보 조회
+      const response = await userService.getMyInfo();
+      setUserName(response.data.name);
+    } catch {
+      // 에러 시 localStorage 정보 사용
+      const storedUser = authService.getStoredUser();
+      setUserName(storedUser?.name || null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     if (window.confirm('로그아웃 하시겠습니까?')) {
@@ -33,11 +64,16 @@ function Navbar() {
             CRUD System
           </Typography>
 
-          {currentUser && (
-            <Typography variant="body2" sx={{ mr: 2 }}>
-              {currentUser.name}님
-            </Typography>
-          )}
+          <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+            <Person sx={{ mr: 0.5, fontSize: 20 }} />
+            {loading ? (
+              <Skeleton variant="text" width={60} />
+            ) : (
+              <Typography variant="body2">
+                {userName || '사용자'}님
+              </Typography>
+            )}
+          </Box>
 
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button

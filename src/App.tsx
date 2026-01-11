@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import UserList from './pages/UserList';
 import UserForm from './pages/UserForm';
 import UserDetail from './pages/UserDetail';
+import MyPage from './pages/MyPage';
 import Navbar from './components/Navbar';
 import { authService } from './services/authService';
 
@@ -55,6 +56,14 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route
+            path="/mypage"
+            element={
+              <PrivateRoute>
+                <MyPage />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/users"
             element={

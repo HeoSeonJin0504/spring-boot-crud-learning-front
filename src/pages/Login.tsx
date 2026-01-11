@@ -38,11 +38,16 @@ function Login() {
     try {
       const response = await authService.login(formData);
       authService.saveTokens(response.data);
-      navigate('/users');
+      navigate('/');
     } catch (error: any) {
-      setError(
-        error.response?.data?.message || '로그인에 실패했습니다.'
-      );
+      const status = error.response?.status;
+      if (status === 401) {
+        setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+      } else if (status === 404) {
+        setError('존재하지 않는 사용자입니다.');
+      } else {
+        setError(error.response?.data?.message || '로그인에 실패했습니다.');
+      }
       console.error('Login failed:', error);
     } finally {
       setLoading(false);

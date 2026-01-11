@@ -26,3 +26,14 @@ export interface RegisterRequest {
   phone: string;
   email?: string;
 }
+
+export interface CurrentUser {
+  userIndex: number;
+  userId: string;
+  name: string;
+  gender: string;
+  phone: string;
+  email: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

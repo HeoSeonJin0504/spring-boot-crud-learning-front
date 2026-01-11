@@ -4,13 +4,14 @@ import PeopleIcon from '@mui/icons-material/People';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { authService } from '../services/authService';
 
 function Home() {
   const navigate = useNavigate();
   const isAuthenticated = authService.isAuthenticated();
-  const currentUser = authService.getCurrentUser();
+  const currentUser = authService.getStoredUser();
 
   const handleLogout = async () => {
     await authService.logout();
@@ -76,7 +77,6 @@ function Home() {
                       variant="contained"
                       sx={{ mt: 3 }}
                       fullWidth
-                      onClick={() => navigate('/login')}
                     >
                       로그인하기
                     </Button>
@@ -112,7 +112,6 @@ function Home() {
                       color="success"
                       sx={{ mt: 3 }}
                       fullWidth
-                      onClick={() => navigate('/register')}
                     >
                       가입하기
                     </Button>
@@ -121,40 +120,76 @@ function Home() {
               </Grid>
             </>
           ) : (
-            <Grid item xs={12} sm={6} md={4}>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: 6,
-                  },
-                  cursor: 'pointer',
-                }}
-                onClick={() => navigate('/users')}
-              >
-                <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 4 }}>
-                  <ListAltIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-                  <Typography variant="h5" component="h2" gutterBottom fontWeight="bold">
-                    사용자 목록
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    등록된 모든 사용자를 조회하고 관리할 수 있습니다
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    sx={{ mt: 3 }}
-                    fullWidth
-                    onClick={() => navigate('/users')}
-                  >
-                    목록 보기
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
+            <>
+              <Grid item xs={12} sm={6} md={4}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: 6,
+                    },
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => navigate('/users')}
+                >
+                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 4 }}>
+                    <ListAltIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+                    <Typography variant="h5" component="h2" gutterBottom fontWeight="bold">
+                      사용자 목록
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      등록된 모든 사용자를 조회하고 관리할 수 있습니다
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      sx={{ mt: 3 }}
+                      fullWidth
+                    >
+                      목록 보기
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: 6,
+                    },
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => navigate('/mypage')}
+                >
+                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 4 }}>
+                    <AccountCircleIcon sx={{ fontSize: 60, color: 'info.main', mb: 2 }} />
+                    <Typography variant="h5" component="h2" gutterBottom fontWeight="bold">
+                      마이페이지
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      내 계정 정보를 확인하고 수정할 수 있습니다
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      color="info"
+                      sx={{ mt: 3 }}
+                      fullWidth
+                    >
+                      내 정보
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </>
           )}
         </Grid>
 
