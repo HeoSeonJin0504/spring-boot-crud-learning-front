@@ -8,11 +8,10 @@ function Navbar() {
   const isAuthenticated = authService.isAuthenticated();
   const currentUser = authService.getCurrentUser();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (window.confirm('로그아웃 하시겠습니까?')) {
-      authService.logout();
+      await authService.logout();
       navigate('/login');
-      window.location.reload();
     }
   };
 

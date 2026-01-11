@@ -12,8 +12,8 @@ function Home() {
   const isAuthenticated = authService.isAuthenticated();
   const currentUser = authService.getCurrentUser();
 
-  const handleLogout = () => {
-    authService.logout();
+  const handleLogout = async () => {
+    await authService.logout();
     window.location.reload();
   };
 

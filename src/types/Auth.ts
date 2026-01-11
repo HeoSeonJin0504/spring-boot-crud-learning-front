@@ -4,12 +4,18 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string;
-  user: {
-    userIndex: number;
-    userId: string;
-    name: string;
-  };
+  accessToken: string;
+  refreshToken: string;
+  userId: string;
+  name: string;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
 }
 
 export interface RegisterRequest {

@@ -37,8 +37,7 @@ function Login() {
 
     try {
       const response = await authService.login(formData);
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      authService.saveTokens(response.data);
       navigate('/users');
     } catch (error: any) {
       setError(
