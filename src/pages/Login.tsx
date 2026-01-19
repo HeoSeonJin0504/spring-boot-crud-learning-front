@@ -41,14 +41,18 @@ function Login() {
       navigate('/');
     } catch (error: any) {
       const status = error.response?.status;
+      
       if (status === 401) {
         setError('아이디 또는 비밀번호가 올바르지 않습니다.');
       } else if (status === 404) {
         setError('존재하지 않는 사용자입니다.');
+      } else if (status === 400) {
+        setError(error.friendlyMessage || '입력 정보를 확인해주세요.');
+      } else if (status === 500) {
+        setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       } else {
         setError(error.response?.data?.message || '로그인에 실패했습니다.');
       }
-      console.error('Login failed:', error);
     } finally {
       setLoading(false);
     }

@@ -143,6 +143,7 @@ function UserForm() {
 
     setLoading(true);
     setError(null);
+    setValidationErrors({});
 
     try {
       if (isEditMode && id) {
@@ -152,13 +153,32 @@ function UserForm() {
           phone: formData.phone,
           email: formData.email,
         });
+        alert('수정이 완료되었습니다.');
       } else {
         await userService.createUser(formData);
+        alert('등록이 완료되었습니다.');
       }
       navigate('/users');
     } catch (error: any) {
-      setError(error.response?.data?.message || '저장에 실패했습니다.');
-      console.error('Failed to save user:', error);
+      const status = error.response?.status;
+      
+      if (status === 400) {
+        // 백엔드 Validation 에러
+        if (error.validationErrors) {
+          setValidationErrors(error.validationErrors);
+          setError('입력 정보를 확인해주세요.');
+        } else {
+          setError(error.friendlyMessage || error.response?.data?.message || '저장에 실패했습니다.');
+        }
+      } else if (status === 403) {
+        setError('권한이 없습니다. 본인의 정보만 수정할 수 있습니다.');
+      } else if (status === 404) {
+        setError('사용자를 찾을 수 없습니다.');
+      } else if (status === 500) {
+        setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      } else {
+        setError(error.response?.data?.message || '저장에 실패했습니다.');
+      }
     } finally {
       setLoading(false);
     }

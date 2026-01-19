@@ -48,16 +48,16 @@ function UserDetail() {
       setError(null);
       const response = await userService.getUserById(userIndex);
       setUser(response.data);
-      // 본인 계정인지 확인
       setIsOwnAccount(authService.isOwnAccount(response.data.userId));
     } catch (error: any) {
-      if (error.response?.status === 404) {
+      const status = error.response?.status;
+      
+      if (status === 404) {
         setError('사용자를 찾을 수 없습니다.');
+      } else if (status === 500) {
+        setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       } else {
-        setError(
-          error.response?.data?.message ||
-            '사용자 정보를 불러오는데 실패했습니다.'
-        );
+        setError(error.friendlyMessage || error.response?.data?.message || '사용자 정보를 불러오는데 실패했습니다.');
       }
     } finally {
       setLoading(false);
@@ -70,12 +70,20 @@ function UserDetail() {
     if (window.confirm(`"${user.name}" 사용자를 정말 삭제하시겠습니까?`)) {
       try {
         await userService.deleteUser(user.userIndex);
+        alert('삭제되었습니다.');
         navigate('/users');
       } catch (error: any) {
-        if (error.response?.status === 403) {
-          alert('본인의 계정만 삭제할 수 있습니다.');
+        const status = error.response?.status;
+        
+        if (status === 403) {
+          alert('권한이 없습니다. 본인의 계정만 삭제할 수 있습니다.');
+        } else if (status === 404) {
+          alert('사용자를 찾을 수 없습니다.');
+          navigate('/users');
+        } else if (status === 500) {
+          alert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         } else {
-          alert(error.response?.data?.message || '삭제에 실패했습니다.');
+          alert(error.friendlyMessage || error.response?.data?.message || '삭제에 실패했습니다.');
         }
       }
     }
@@ -99,14 +107,23 @@ function UserDetail() {
           <Alert severity="error">
             {error || '사용자를 찾을 수 없습니다.'}
           </Alert>
-          <Button
-            variant="outlined"
-            onClick={() => navigate('/users')}
-            sx={{ mt: 2 }}
-            startIcon={<ArrowBack />}
-          >
-            목록으로
-          </Button>
+          <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+            <Button
+              variant="outlined"
+              onClick={() => navigate('/users')}
+              startIcon={<ArrowBack />}
+            >
+              목록으로
+            </Button>
+            {error && error.includes('서버 오류') && (
+              <Button
+                variant="contained"
+                onClick={() => loadUser(Number(id))}
+              >
+                재시도
+              </Button>
+            )}
+          </Box>
         </Container>
       </Box>
     );

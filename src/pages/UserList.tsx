@@ -46,17 +46,21 @@ function UserList() {
       const response = await userService.getAllUsers();
       setUsers(response.data);
     } catch (error: any) {
-      setError(
-        error.response?.data?.message || '사용자 목록을 불러오는데 실패했습니다.'
-      );
-      console.error('Failed to load users:', error);
+      const status = error.response?.status;
+      
+      if (status === 500) {
+        setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      } else if (status === 401) {
+        setError('인증이 만료되었습니다. 다시 로그인해주세요.');
+      } else {
+        setError(error.friendlyMessage || error.response?.data?.message || '사용자 목록을 불러오는데 실패했습니다.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (userIndex: number, userId: string, name: string) => {
-    // 본인 확인
     if (!authService.isOwnAccount(userId)) {
       alert('본인의 계정만 삭제할 수 있습니다.');
       return;
@@ -66,11 +70,19 @@ function UserList() {
       try {
         await userService.deleteUser(userIndex);
         loadUsers();
+        alert('삭제되었습니다.');
       } catch (error: any) {
-        if (error.response?.status === 403) {
-          alert('본인의 계정만 삭제할 수 있습니다.');
+        const status = error.response?.status;
+        
+        if (status === 403) {
+          alert('권한이 없습니다. 본인의 계정만 삭제할 수 있습니다.');
+        } else if (status === 404) {
+          alert('사용자를 찾을 수 없습니다.');
+          loadUsers();
+        } else if (status === 500) {
+          alert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         } else {
-          alert(error.response?.data?.message || '삭제에 실패했습니다.');
+          alert(error.friendlyMessage || error.response?.data?.message || '삭제에 실패했습니다.');
         }
       }
     }
@@ -126,7 +138,15 @@ function UserList() {
         </Box>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert 
+            severity="error" 
+            sx={{ mb: 3 }}
+            action={
+              <Button color="inherit" size="small" onClick={loadUsers}>
+                재시도
+              </Button>
+            }
+          >
             {error}
           </Alert>
         )}

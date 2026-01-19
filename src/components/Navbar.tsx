@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { AppBar, Box, Button, Container, Toolbar, Typography, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Home, Logout, People, Person } from '@mui/icons-material';
-import { userService } from '../services/api';
 import { authService } from '../services/authService';
+import { userService } from '../services/api';
 
 function Navbar() {
   const navigate = useNavigate();
@@ -41,17 +41,7 @@ function Navbar() {
 
   const handleLogout = async () => {
     if (window.confirm('로그아웃 하시겠습니까?')) {
-      const userId = authService.getCurrentUserId();
-      if (userId) {
-        try {
-          await userService.logout(userId);
-        } catch (error: any) {
-          if (error.response?.status === 403) {
-            console.error('본인만 로그아웃할 수 있습니다.');
-          }
-        }
-      }
-      authService.clearTokens();
+      await authService.logout();
       navigate('/login');
     }
   };

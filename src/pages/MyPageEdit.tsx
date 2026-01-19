@@ -105,14 +105,29 @@ function MyPageEdit() {
 
     setLoading(true);
     setError(null);
+    setValidationErrors({});
 
     try {
       await userService.updateUser(userIndex, formData);
       alert('정보가 수정되었습니다.');
       navigate('/mypage');
     } catch (error: any) {
-      if (error.response?.status === 403) {
-        setError('본인의 정보만 수정할 수 있습니다.');
+      const status = error.response?.status;
+      
+      if (status === 400) {
+        if (error.validationErrors) {
+          setValidationErrors(error.validationErrors);
+          setError('입력 정보를 확인해주세요.');
+        } else {
+          setError(error.friendlyMessage || '수정에 실패했습니다.');
+        }
+      } else if (status === 403) {
+        setError('권한이 없습니다. 본인의 정보만 수정할 수 있습니다.');
+        setTimeout(() => navigate('/mypage'), 2000);
+      } else if (status === 404) {
+        setError('사용자를 찾을 수 없습니다.');
+      } else if (status === 500) {
+        setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       } else {
         setError(error.response?.data?.message || '수정에 실패했습니다.');
       }

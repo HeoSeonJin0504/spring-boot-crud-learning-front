@@ -38,7 +38,6 @@ function Register() {
   const validateForm = (): boolean => {
     const errors: typeof validationErrors = {};
 
-    // 아이디 검증
     if (!formData.userId.trim()) {
       errors.userId = '아이디는 필수입니다';
     } else if (formData.userId.length < 4 || formData.userId.length > 50) {
@@ -103,14 +102,33 @@ function Register() {
 
     setLoading(true);
     setError(null);
+    setValidationErrors({});
 
     try {
       await authService.register(formData);
       alert('회원가입이 완료되었습니다. 로그인해주세요.');
       navigate('/login');
     } catch (error: any) {
-      setError(error.response?.data?.message || '회원가입에 실패했습니다.');
-      console.error('Registration failed:', error);
+      const status = error.response?.status;
+
+      if (status === 400) {
+        // 백엔드 Validation 에러가 있으면 필드별로 표시
+        if (error.validationErrors) {
+          setValidationErrors(error.validationErrors);
+          setError('입력 정보를 확인해주세요.');
+        } else {
+          // 중복 등의 일반 400 에러
+          setError(
+            error.friendlyMessage ||
+              error.response?.data?.message ||
+              '회원가입에 실패했습니다.'
+          );
+        }
+      } else if (status === 500) {
+        setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      } else {
+        setError(error.response?.data?.message || '회원가입에 실패했습니다.');
+      }
     } finally {
       setLoading(false);
     }
@@ -145,7 +163,10 @@ function Register() {
               onChange={handleChange}
               margin="normal"
               error={Boolean(validationErrors.userId)}
-              helperText={validationErrors.userId || '4-50자, 영문/숫자/언더스코어(_)만 사용'}
+              helperText={
+                validationErrors.userId ||
+                '4-50자, 영문/숫자/언더스코어(_)만 사용'
+              }
             />
             <TextField
               fullWidth

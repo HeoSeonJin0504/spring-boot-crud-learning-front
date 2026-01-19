@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { type LoginRequest, type LoginResponse, type RegisterRequest, type RefreshTokenResponse } from '../types/Auth';
+import { userService } from './api';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -33,6 +34,19 @@ export const authService = {
       authService.clearTokens();
       return null;
     }
+  },
+  
+  // 로그아웃
+  logout: async () => {
+    const userId = authService.getCurrentUserId();
+    if (userId) {
+      try {
+        await userService.logout(userId);
+      } catch (error) {
+        console.error('Logout API failed:', error);
+      }
+    }
+    authService.clearTokens();
   },
   
   clearTokens: () => {
