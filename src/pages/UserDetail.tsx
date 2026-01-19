@@ -25,6 +25,7 @@ import {
   WcOutlined,
 } from '@mui/icons-material';
 import { userService } from '../services/api';
+import { authService } from '../services/authService';
 import { type UserResponseDto } from '../types/User';
 
 function UserDetail() {
@@ -33,6 +34,7 @@ function UserDetail() {
   const [user, setUser] = useState<UserResponseDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isOwnAccount, setIsOwnAccount] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -40,31 +42,41 @@ function UserDetail() {
     }
   }, [id]);
 
-  const loadUser = async (userId: number) => {
+  const loadUser = async (userIndex: number) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await userService.getUserById(userId);
+      const response = await userService.getUserById(userIndex);
       setUser(response.data);
+      // 본인 계정인지 확인
+      setIsOwnAccount(authService.isOwnAccount(response.data.userId));
     } catch (error: any) {
-      setError(
-        error.response?.data?.message ||
-          '사용자 정보를 불러오는데 실패했습니다.'
-      );
-      console.error('Failed to load user:', error);
+      if (error.response?.status === 404) {
+        setError('사용자를 찾을 수 없습니다.');
+      } else {
+        setError(
+          error.response?.data?.message ||
+            '사용자 정보를 불러오는데 실패했습니다.'
+        );
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm(`"${user?.name}" 사용자를 정말 삭제하시겠습니까?`)) {
+    if (!user) return;
+
+    if (window.confirm(`"${user.name}" 사용자를 정말 삭제하시겠습니까?`)) {
       try {
-        await userService.deleteUser(Number(id));
+        await userService.deleteUser(user.userIndex);
         navigate('/users');
       } catch (error: any) {
-        alert(error.response?.data?.message || '삭제에 실패했습니다.');
-        console.error('Failed to delete user:', error);
+        if (error.response?.status === 403) {
+          alert('본인의 계정만 삭제할 수 있습니다.');
+        } else {
+          alert(error.response?.data?.message || '삭제에 실패했습니다.');
+        }
       }
     }
   };
@@ -157,7 +169,15 @@ function UserDetail() {
               <Card variant="outlined">
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <WcOutlined sx={{ mr: 1, color: user.gender === '남성' ? 'primary.main' : 'secondary.main' }} />
+                    <WcOutlined
+                      sx={{
+                        mr: 1,
+                        color:
+                          user.gender === '남성'
+                            ? 'primary.main'
+                            : 'secondary.main',
+                      }}
+                    />
                     <Typography variant="caption" color="text.secondary">
                       성별
                     </Typography>
@@ -235,25 +255,34 @@ function UserDetail() {
           <Divider sx={{ my: 4 }} />
 
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <Button
-              variant="contained"
-              startIcon={<Edit />}
-              onClick={() => navigate(`/users/${id}/edit`)}
-              size="large"
-              sx={{ flex: 1, minWidth: 150 }}
-            >
-              수정
-            </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              startIcon={<Delete />}
-              onClick={handleDelete}
-              size="large"
-              sx={{ flex: 1, minWidth: 150 }}
-            >
-              삭제
-            </Button>
+            {isOwnAccount && (
+              <>
+                <Button
+                  variant="contained"
+                  startIcon={<Edit />}
+                  onClick={() => navigate(`/users/${id}/edit`)}
+                  size="large"
+                  sx={{ flex: 1, minWidth: 150 }}
+                >
+                  수정
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Delete />}
+                  onClick={handleDelete}
+                  size="large"
+                  sx={{ flex: 1, minWidth: 150 }}
+                >
+                  삭제
+                </Button>
+              </>
+            )}
+            {!isOwnAccount && (
+              <Alert severity="info" sx={{ flex: 1 }}>
+                본인의 정보만 수정/삭제할 수 있습니다.
+              </Alert>
+            )}
             <Button
               variant="outlined"
               startIcon={<ArrowBack />}

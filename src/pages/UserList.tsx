@@ -26,6 +26,7 @@ import {
   Refresh,
 } from '@mui/icons-material';
 import { userService } from '../services/api';
+import { authService } from '../services/authService';
 import { type UserResponseDto } from '../types/User';
 
 function UserList() {
@@ -54,14 +55,23 @@ function UserList() {
     }
   };
 
-  const handleDelete = async (id: number, name: string) => {
+  const handleDelete = async (userIndex: number, userId: string, name: string) => {
+    // 본인 확인
+    if (!authService.isOwnAccount(userId)) {
+      alert('본인의 계정만 삭제할 수 있습니다.');
+      return;
+    }
+    
     if (window.confirm(`"${name}" 사용자를 정말 삭제하시겠습니까?`)) {
       try {
-        await userService.deleteUser(id);
+        await userService.deleteUser(userIndex);
         loadUsers();
       } catch (error: any) {
-        alert(error.response?.data?.message || '삭제에 실패했습니다.');
-        console.error('Failed to delete user:', error);
+        if (error.response?.status === 403) {
+          alert('본인의 계정만 삭제할 수 있습니다.');
+        } else {
+          alert(error.response?.data?.message || '삭제에 실패했습니다.');
+        }
       }
     }
   };
@@ -213,24 +223,28 @@ function UserList() {
                           <Visibility />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="수정">
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => navigate(`/users/${user.userIndex}/edit`)}
-                        >
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="삭제">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => handleDelete(user.userIndex, user.name)}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Tooltip>
+                      {authService.isOwnAccount(user.userId) && (
+                        <>
+                          <Tooltip title="수정">
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              onClick={() => navigate(`/users/${user.userIndex}/edit`)}
+                            >
+                              <Edit />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="삭제">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleDelete(user.userIndex, user.userId, user.name)}
+                            >
+                              <Delete />
+                            </IconButton>
+                          </Tooltip>
+                        </>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))

@@ -8,6 +8,11 @@ import {
   CardContent,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Grid,
   Paper,
@@ -15,6 +20,7 @@ import {
 } from '@mui/material';
 import {
   Edit,
+  Delete,
   ArrowBack,
   EmailOutlined,
   PersonOutline,
@@ -25,6 +31,7 @@ import {
   AccountCircle,
 } from '@mui/icons-material';
 import { userService } from '../services/api';
+import { authService } from '../services/authService';
 import { type UserResponseDto } from '../types/User';
 
 function MyPage() {
@@ -32,6 +39,8 @@ function MyPage() {
   const [user, setUser] = useState<UserResponseDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadMyInfo();
@@ -43,14 +52,40 @@ function MyPage() {
       setError(null);
       const response = await userService.getMyInfo();
       setUser(response.data);
+      // userIndex 저장 (본인 확인용)
+      authService.saveUserIndex(response.data.userIndex);
     } catch (error: any) {
       setError(
         error.response?.data?.message ||
           '내 정보를 불러오는데 실패했습니다.'
       );
-      console.error('Failed to load my info:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!user) return;
+    
+    setDeleting(true);
+    try {
+      await userService.deleteUser(user.userIndex);
+      authService.clearTokens();
+      alert('계정이 삭제되었습니다.');
+      navigate('/login');
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        alert('본인의 계정만 삭제할 수 있습니다.');
+      } else {
+        alert(error.response?.data?.message || '계정 삭제에 실패했습니다.');
+      }
+    } finally {
+      setDeleting(false);
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -217,7 +252,7 @@ function MyPage() {
             <Button
               variant="contained"
               startIcon={<Edit />}
-              onClick={() => navigate(`/users/${user.userIndex}/edit`)}
+              onClick={() => navigate(`/mypage/edit`)}
               size="large"
               sx={{ flex: 1, minWidth: 150 }}
             >
@@ -225,16 +260,50 @@ function MyPage() {
             </Button>
             <Button
               variant="outlined"
+              color="error"
+              startIcon={<Delete />}
+              onClick={handleDeleteClick}
+              size="large"
+              sx={{ flex: 1, minWidth: 150 }}
+            >
+              계정 삭제
+            </Button>
+            <Button
+              variant="outlined"
               startIcon={<ArrowBack />}
               onClick={() => navigate('/')}
               size="large"
-              sx={{ flex: 1, minWidth: 150 }}
+              fullWidth
             >
               홈으로
             </Button>
           </Box>
         </Paper>
       </Container>
+
+      {/* 계정 삭제 확인 다이얼로그 */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>계정 삭제</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            정말로 계정을 삭제하시겠습니까?<br />
+            이 작업은 되돌릴 수 없으며, 모든 데이터가 삭제됩니다.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>
+            취소
+          </Button>
+          <Button 
+            onClick={handleDeleteConfirm} 
+            color="error" 
+            variant="contained"
+            disabled={deleting}
+          >
+            {deleting ? '삭제 중...' : '삭제'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

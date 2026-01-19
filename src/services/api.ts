@@ -36,7 +36,7 @@ const addRefreshSubscriber = (callback: (token: string) => void) => {
   refreshSubscribers.push(callback);
 };
 
-// 응답 인터셉터: 401 에러 시 토큰 재발급 시도
+// 응답 인터셉터: 401/403 에러 처리
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -81,14 +81,14 @@ api.interceptors.response.use(
       window.location.href = '/login';
     }
     
-    // 403 Forbidden
+    // 403 Forbidden - 권한 없음 (본인이 아님)
     if (error.response?.status === 403) {
-      console.error('권한이 없습니다.');
+      error.friendlyMessage = '본인의 정보만 수정/삭제할 수 있습니다.';
     }
     
     // 404 Not Found
     if (error.response?.status === 404) {
-      console.error('리소스를 찾을 수 없습니다.');
+      error.friendlyMessage = '요청한 리소스를 찾을 수 없습니다.';
     }
     
     return Promise.reject(error);
@@ -103,4 +103,5 @@ export const userService = {
   updateUser: (userIndex: number, user: Partial<UserRequestDto>) => 
     api.put<UserResponseDto>(`/users/${userIndex}`, user),
   deleteUser: (userIndex: number) => api.delete(`/users/${userIndex}`),
+  logout: (userId: string) => api.post(`/auth/logout?userId=${userId}`),
 };

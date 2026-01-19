@@ -7,6 +7,7 @@ import UserList from './pages/UserList';
 import UserForm from './pages/UserForm';
 import UserDetail from './pages/UserDetail';
 import MyPage from './pages/MyPage';
+import MyPageEdit from './pages/MyPageEdit';
 import Navbar from './components/Navbar';
 import { authService } from './services/authService';
 
@@ -61,6 +62,14 @@ function App() {
             element={
               <PrivateRoute>
                 <MyPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/mypage/edit"
+            element={
+              <PrivateRoute>
+                <MyPageEdit />
               </PrivateRoute>
             }
           />
